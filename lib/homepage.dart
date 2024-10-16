@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'career page.dart';
-import 'career_support.dart'; // Importing the new Career Support page
+import 'career_support.dart'; // Importing the Career Support page
 import 'about_page.dart';
 import 'teacher_detail_page.dart';
 import 'group.dart';
-import 'profile.dart'; 
-import 'mail.dart';// Importing the Profile page
+import 'profile.dart';
+import 'mail.dart'; // Importing the Mail page
+import 'response.dart'; // Importing the new Response page
 
 class HomePage extends StatefulWidget {
   final bool isAdmin; // Accepting the isAdmin parameter
@@ -27,11 +28,18 @@ class _HomePageState extends State<HomePage> {
 
     // Define the pages for regular users
     _pages = [
-       TeachersPage(),
+      TeachersPage(),
       const CareerPage(),
-      const CareerSupportPage(), // New Career Support Page
       const GroupPage(),
     ];
+
+    if (!widget.isAdmin) {
+      // For regular users, include CareerSupportPage (Mentor)
+      _pages.insert(2, const CareerSupportPage());
+    } else {
+      // For admin users, include ResponsePage
+      _pages.insert(2, const ResponsePage());
+    }
 
     // If the user is an admin, add the ProfilePage
     if (widget.isAdmin) {
@@ -51,7 +59,8 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(builder: (context) => const AboutPage()),
     );
   }
-    void _goToMailPage() {
+
+  void _goToMailPage() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const MailPage()),
@@ -62,39 +71,38 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF003F63),
-     appBar: AppBar(
-  backgroundColor: const Color(0xFFFFFFFF),
-  title: const Align(
-    alignment: Alignment.centerLeft, // Start title from the left
-    child: Text(
-      'PU Connect',
-      style: TextStyle(
-        color: Color(0xFF003F63),
-        fontWeight: FontWeight.bold,
-        fontStyle: FontStyle.italic,
-      ),
-    ),
-  ),
-  elevation: 0,
-  actions: [
-   IconButton(
-            icon: const Icon(Icons.mail_outline, color: Color(0xFF003F63)), // Mailbox icon
-            onPressed: _goToMailPage, // Navigate to the MailPage
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFFFFFFF),
+        title: const Align(
+          alignment: Alignment.centerLeft, // Start title from the left
+          child: Text(
+            'PU Connect',
+            style: TextStyle(
+              color: Color(0xFF003F63),
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+            ),
           ),
-    IconButton(
-      icon: const Icon(Icons.info_outline, color: Color(0xFF003F63)), // Info icon
-      onPressed: _goToAboutPage, // Navigate to the AboutPage
-    ),
-  ],
-),
-
+        ),
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.mail_outline, color: Color(0xFF003F63)),
+            onPressed: _goToMailPage,
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: Color(0xFF003F63)),
+            onPressed: _goToAboutPage,
+          ),
+        ],
+      ),
       body: _pages[_currentIndex], // Dynamically show the correct page
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFFFFFFFF),
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
         selectedItemColor: const Color(0xFF003F63),
-        unselectedItemColor: const Color(0xFF000000),
+        unselectedItemColor: const Color(0xFF636363),
         type: BottomNavigationBarType.fixed,
         items: [
           const BottomNavigationBarItem(
@@ -105,11 +113,16 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.work),
             label: 'Research',
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.handshake),
-
-            label: 'Mentor', // New Career Support Page
-          ),
+          if (!widget.isAdmin)
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.handshake),
+              label: 'Mentor', // Mentor for non-admins
+            ),
+          if (widget.isAdmin)
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.comment),
+              label: 'Response', // Response for admins
+            ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.group),
             label: 'Clubs',
@@ -124,6 +137,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
 
 class TeachersPage extends StatefulWidget {
   @override

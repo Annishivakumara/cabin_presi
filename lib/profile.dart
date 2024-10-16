@@ -52,10 +52,10 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: const Color(0xFF003F63), // Set background color
       appBar: AppBar(
         backgroundColor: const Color(0xFF003F63),
-         title: const Text(
-    "Profile",
-    style: TextStyle(color: Colors.white), // Set text color to white
-  ),
+        title: const Text(
+          "Profile",
+          style: TextStyle(color: Colors.white), // Set text color to white
+        ),
         actions: [
           IconButton(
             icon: Icon(isEditing ? Icons.save : Icons.edit),
@@ -117,7 +117,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   label: 'Description:',
                   controller: descriptionController,
                   isEditing: isEditing,
-                  
                 ),
               ],
             ),

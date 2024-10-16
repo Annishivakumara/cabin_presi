@@ -81,10 +81,11 @@ class _ConnectPageState extends State<ConnectPage> {
       appBar: AppBar(
         title: const Text(
           'Connect',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Color(0xFF003366)),
+
         ),
-        backgroundColor: const Color(0xFF003F63),
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: const Color(0xFFFFFFFF),
+        iconTheme: const IconThemeData(color: Color(0xFF003366)),
       ),
       backgroundColor: const Color(0xFF003F63),
       body: Column(
@@ -199,10 +200,10 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
       appBar: AppBar(
   title: Text(
     widget.teacher['name']!,
-    style: const TextStyle(color: Colors.white), // Set text color to white
+    style: TextStyle(color: Color(0xFF003366)), // Set text color to white
   ),
-   iconTheme: IconThemeData(color: Colors.white),
-  backgroundColor: const Color(0xFF003F63),
+   iconTheme: const IconThemeData(color: Color(0xFF003366)),
+  backgroundColor: const Color(0xFFFFFFFF),
 ),
 
       backgroundColor: const Color(0xFF003F63),

@@ -26,7 +26,21 @@ class SignUpPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 40),
-
+                   TextFormField(
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.person, color: Colors.black),
+                    hintText: 'User Name', // Placeholder that disappears when typing
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.black),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 // Email Field
                 TextFormField(
                   style: const TextStyle(color: Colors.black),
