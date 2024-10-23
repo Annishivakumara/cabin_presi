@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ConnectPage extends StatefulWidget {
   const ConnectPage({super.key});
@@ -198,14 +199,13 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-  title: Text(
-    widget.teacher['name']!,
-    style: TextStyle(color: Color(0xFF003366)), // Set text color to white
-  ),
-   iconTheme: const IconThemeData(color: Color(0xFF003366)),
-  backgroundColor: const Color(0xFFFFFFFF),
-),
-
+        title: Text(
+          widget.teacher['name']!,
+          style: TextStyle(color: Color(0xFF003366)), // Set text color to white
+        ),
+        iconTheme: const IconThemeData(color: Color(0xFF003366)),
+        backgroundColor: const Color(0xFFFFFFFF),
+      ),
       backgroundColor: const Color(0xFF003F63),
       body: SingleChildScrollView( // Added Scroll View
         child: Padding(
@@ -213,7 +213,7 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
           child: Column(
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage(widget.teacher['image']!),//
+                backgroundImage: AssetImage(widget.teacher['image']!),
                 radius: 60,
               ),
               const SizedBox(height: 16),
@@ -239,20 +239,20 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
-             TextField(
-  controller: _purposeController,
-  decoration: InputDecoration(
-    hintText: 'Enter the purpose of appointment',
-    filled: true,
-    fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(5),
-      borderSide: BorderSide.none,
-    ),
-  ),
-  maxLines: 10, // Set maximum lines to create a larger box
-  minLines: 5, // Set minimum lines to start with a larger box
-),
+              TextField(
+                controller: _purposeController,
+                decoration: InputDecoration(
+                  hintText: 'Enter the purpose of appointment',
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                maxLines: 10, // Set maximum lines to create a larger box
+                minLines: 5, // Set minimum lines to start with a larger box
+              ),
 
               const SizedBox(height: 16),
               ElevatedButton(
@@ -261,15 +261,22 @@ class _TeacherDetailPageState extends State<TeacherDetailPage> {
                     : () {
                         String purpose = _purposeController.text;
                         if (purpose.isNotEmpty) {
-                          setState(() {
-                            isAppointmentSent = true;
+                          // Add appointment request to Firestore
+                          FirebaseFirestore.instance.collection('issues').add({
+                            'studentName': widget.teacher['name'],
+                            'issue': purpose,
+                            'timestamp': FieldValue.serverTimestamp(),
+                          }).then((_) {
+                            setState(() {
+                              isAppointmentSent = true;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Request sent to ${widget.teacher['name']} for "$purpose"'),
+                              ),
+                            );
                           });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'Request sent to ${widget.teacher['name']} for "$purpose"'),
-                            ),
-                          );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(

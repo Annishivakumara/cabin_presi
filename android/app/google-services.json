@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1084483006398",
+    "project_id": "pu-connect-c44e2",
+    "storage_bucket": "pu-connect-c44e2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084483006398:android:391dc4171c25b20ddf13ef",
+        "android_client_info": {
+          "package_name": "com.example.teacher"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8jk8AmpgCKZtok_6YeFabDTYL8O5lUK0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

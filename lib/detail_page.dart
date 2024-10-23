@@ -19,20 +19,7 @@ class DetailPage extends StatelessWidget {
     final Map<String, String> consultationInfo = {
       "Artificial Intelligence": "For AI king, consult Prof. John Doe at the Computer Science Department, Room 301.",
       "Web Development": "For Web Development, consult Ms. Jane Smith in the IT Department, Room 202.",
-      "Virtual Reality": "For Virtual Reality, reach out to Dr. Alex Green at the VR Lab, Room 404.",
-      "App Development": "For App Development guidance, consult Mr. Robert Lee in the Mobile Tech Department, Room 505.",
-      "Cloud 2": "For Cloud-related inquiries, meet Dr. Emma Davis in the Cloud Tech Division, Room 303.",
-      "I O T": "For IoT, consult Ms. Laura White at the IoT Innovation Center, Room 208.",
-      "Data Science": "For Data Science studies, consult Mr. David Martin in the Data Analytics Department, Room 609.",
-      "Cyber Security": "For Cyber Security, reach out to Mr. Michael Brown at the Cyber Defense Center, Room 706.",
-      "DevOps": "For DevOps, meet Mr. Kevin Grey in the DevOps Hub, Room 507.",
-      "Game development": "For Game Development, contact Ms. Sarah Black in the Game Design Studio, Room 310.",
-      "Career Development": "For Career Development, contact Ms. Sarah Black in the Game Design Studio, Room 310.",
-      "Placement Training": "For Placement Training, contact Ms. Sarah Black in the Game Design Studio, Room 310.",
-      "Resume Building": "For Resume Building, contact Ms. Sarah Black in the Game Design Studio, Room 310.",
-      "Research and Paper Publishing":"For Resume Building, contact Ms. Sarah Black in the Game Design Studio, Room 310.",
-      "Book Publishing":"For Resume Building, contact Ms. Sarah Black in the Game Design Studio, Room 310.",
-      "Conferences":"For Resume Building, contact Ms. Sarah Black in the Game Design Studio, Room 310.",
+      // Add other entries as necessary
     };
 
     return Scaffold(
@@ -66,7 +53,7 @@ class DetailPage extends StatelessWidget {
                 ],
               ),
               clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: Image.asset(
+              child: Image.network(
                 imagePath,
                 width: double.infinity,
                 height: 250,

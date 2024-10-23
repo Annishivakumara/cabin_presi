@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CareerSupportPage extends StatefulWidget {
@@ -12,12 +12,20 @@ class _CareerSupportPageState extends State<CareerSupportPage> {
   final TextEditingController _issueController = TextEditingController();
   bool _isIssueSent = false;
 
-  void _submitIssue() {
-    // Here you can handle the submission logic (e.g., sending the issue to a server)
-    setState(() {
-      _isIssueSent = true; // Change to issue sent state
-      _issueController.clear(); // Clear the text field
-    });
+  // Submitting issue to Firestore
+  void _submitIssue() async {
+    if (_issueController.text.isNotEmpty) {
+      await FirebaseFirestore.instance.collection('issues').add({
+        'issue': _issueController.text,
+        'timestamp': FieldValue.serverTimestamp(),
+        'studentName': 'Blessed Prince P', // Replace with dynamic student name
+      });
+
+      setState(() {
+        _isIssueSent = true; // Change to issue sent state
+        _issueController.clear(); // Clear the text field
+      });
+    }
   }
 
   @override
@@ -39,7 +47,7 @@ class _CareerSupportPageState extends State<CareerSupportPage> {
                   ),
                   const SizedBox(width: 16),
                   const Text(
-                    'Blessed Prince P ', // Replace with the mentor's name
+                    'Blessed Prince P ', // Replace with dynamic student name
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -62,8 +70,6 @@ class _CareerSupportPageState extends State<CareerSupportPage> {
               const SizedBox(height: 16),
               const Text(
                 "We provide a supportive space for students to address personal, college-related, or attendance issues. Our mentor is here to listen and guide you through challenges in your academic journey. Whether you need advice or assistance, don’t hesitate to reach out. Your well-being is our priority.",
-
-
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               const SizedBox(height: 16),
@@ -106,28 +112,26 @@ class _CareerSupportPageState extends State<CareerSupportPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Inside the Column of the CareerSupportPage
-ElevatedButton(
-  onPressed: _submitIssue,
-  style: ElevatedButton.styleFrom(
-    backgroundColor: const Color(0xFF003F63),
-    padding: const EdgeInsets.symmetric(vertical: 12),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-  child: Center(
-    child: Text(
-      _isIssueSent ? 'Submitted' : 'Submit',
-      style: const TextStyle(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
-    ),
-  ),
-),
-
+                    ElevatedButton(
+                      onPressed: _submitIssue,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF003F63),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          _isIssueSent ? 'Submitted' : 'Submit',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

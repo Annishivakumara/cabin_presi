@@ -1,50 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'detail_page.dart'; // Import the DetailPage
+import 'upload_career_page.dart'; // Import the new UploadCareerPage
 
 class CareerPage extends StatelessWidget {
-  const CareerPage({super.key});
+  final bool isAdmin; // Add isAdmin field
+
+  const CareerPage({super.key, required this.isAdmin}); // Accept isAdmin in constructor
 
   @override
   Widget build(BuildContext context) {
-    // List of image assets, names, and descriptions
-    final List<Map<String, String>> imageAssets = [
-      {
-  "path": "assets/ai 2.avif",
-  "name": "Artificial Intelligence",
-  "description": "Artificial Intelligence (AI) is a transformative field that enables machines to learn and make decisions. After studying AI, individuals can develop skills in automation, machine learning, and data-driven problem-solving. They can apply AI techniques in industries like healthcare, finance, and technology, enhancing decision-making, improving operational efficiency, and innovating new solutions. Outcomes include proficiency in creating intelligent systems, enhancing business processes through automation, and contributing to cutting-edge research and product development, leading to impactful career opportunities in AI-driven sectors."
-},
-
-      {'path': 'assets/web dev.avif', 'name': 'Web Devlopment', 'description': 'Next, focus on data collection and preprocessing, ensuring quality and relevance. Develop AI models using appropriate algorithms and frameworks, and continuously test and refine them.'},
-      {'path': 'assets/virtual.jpg', 'name': 'Virtual Reality', 'description': 'Integrate AI solutions into existing systems and monitor performance to ensure effectiveness. Invest in ongoing training and skill development for teams.'},
-      {'path': 'assets/app dev.png', 'name': 'App Development', 'description': 'Finally, stay updated with emerging technologies and ethical considerations to maintain a competitive edge and address societal impacts responsibly.'},
-      {'path': 'assets/cloud 2.jpeg', 'name': 'Cloud Development', 'description': 'Detailed description related to Cloud 2 image.'},
-      {'path': 'assets/iot.avif', 'name': 'I O T ', 'description': 'Detailed description related to Cloud 3 image.'},
-      {'path': 'assets/dta 3.png', 'name': 'Data Science', 'description': 'Detailed description related to Cyber 2 image.'},
-      {'path': 'assets/cyber 3.jpeg', 'name': 'Cyber Security', 'description': 'Detailed description related to Cyber 3 image.'},
-      {'path': 'assets/devops 2.jpeg', 'name': 'Devops', 'description': 'Detailed description related to Cyber image.'},
-      {'path': 'assets/game 3.jpg', 'name': 'Game development', 'description': 'Detailed description related to Data 2 image.'},
-      {'path': 'assets/carrer dev.jpg', 'name': 'carrer  development', 'description': 'Detailed description related to Data 2 image.'},
-      {'path': 'assets/placement.png', 'name': 'placement Trining', 'description': 'Detailed description related to Data 2 image.'},
-      {'path': 'assets/resume.jpg', 'name': 'Resume Building', 'description': 'Detailed description related to Data 2 image.'},
-      {
-  'path': 'assets/paper.jpg',
-  'name': 'Research and Paper Publishing',
-  'description': 'Comprehensive services for publishing research papers, including peer review, editing, and distribution to various academic journals.'
-},
-{
-  'path': 'assets/book publisher.webp',
-  'name': 'Book Publishing',
-  'description': 'End-to-end book publishing solutions, from manuscript preparation to printing, distribution, and marketing for authors.'
-},
-{
-  'path': 'assets/conferance.avif',
-  'name': 'Conferences',
-  'description': 'Organizing academic conferences, workshops, and seminars that foster collaboration and knowledge sharing among researchers and professionals.'
-}
-
-
-    ];
-
     return Scaffold(
       backgroundColor: const Color(0xFF003F63), // Background color for the scaffold
       appBar: AppBar(
@@ -60,66 +25,113 @@ class CareerPage extends StatelessWidget {
         iconTheme: const IconThemeData(
           color: Colors.white, // Set color of icons, including the back arrow
         ),
+        actions: isAdmin
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const UploadCareerPage(),
+                      ),
+                    );
+                  },
+                ),
+              ]
+            : null, // Show add button only for admins
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: imageAssets.length,
-        itemBuilder: (context, index) {
-          final image = imageAssets[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DetailPage(
-                    imagePath: image['path']!,
-                    imageName: image['name']!,
-                    imageDescription: image['description']!,
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('careers').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('No career opportunities available.'));
+          }
+
+          final careers = snapshot.data!.docs;
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: careers.length,
+            itemBuilder: (context, index) {
+              final career = careers[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailPage(
+                        imagePath: career['imagePath'],
+                        imageName: career['name'],
+                        imageDescription: career['description'],
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white, // White background for each container
+                    borderRadius: BorderRadius.circular(8.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2), // Shadow position
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Image.network(
+                          career['imagePath'], // Use Image.network for URLs
+                          width: double.infinity, // Full width of the container
+                          height: 200, // Fixed height for consistent display
+                          fit: BoxFit.cover, // Ensures the image covers the container
+                          loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) {
+                              return child; // Show the image once it's loaded
+                            }
+                            return Center(
+                              child: CircularProgressIndicator(
+                                valueColor: const AlwaysStoppedAnimation<Color>(Colors.black), // Set the loading color
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                    : null, // Display the loading progress
+                              ),
+                            );
+                          },
+                          errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                            return const Center(
+                              child: Icon(Icons.error, color: Colors.red), // Show an error icon if image fails to load
+                            );
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          career['name'],
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0076CE),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
             },
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 16.0),
-              decoration: BoxDecoration(
-                color: Colors.white, // White background for each container
-                borderRadius: BorderRadius.circular(8.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 1,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2), // Shadow position
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.asset(
-                      image['path']!,
-                      width: double.infinity, // Full width of the container
-                      height: 200, // Fixed height for consistent display
-                      fit: BoxFit.cover, // Ensures the image covers the container
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      image['name']!,
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0076CE),
-
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           );
         },
       ),

@@ -124,3 +124,137 @@ class SignInPage extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+//firebase
+// import 'package:flutter/material.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'homepage.dart'; // Importing the home page
+// import 'signup.dart'; // Importing the sign-up page
+
+// class SignInPage extends StatefulWidget {
+//   const SignInPage({Key? key}) : super(key: key);
+
+//   @override
+//   _SignInPageState createState() => _SignInPageState();
+// }
+
+// class _SignInPageState extends State<SignInPage> {
+//   final FirebaseAuth _auth = FirebaseAuth.instance;
+//   final TextEditingController _emailController = TextEditingController();
+//   final TextEditingController _passwordController = TextEditingController();
+
+//   void _signIn() async {
+//     try {
+//       await _auth.signInWithEmailAndPassword(
+//         email: _emailController.text.trim(),
+//         password: _passwordController.text.trim(),
+//       );
+      
+//       bool isAdmin = _emailController.text.contains('@teacher');
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(builder: (context) => HomePage(isAdmin: isAdmin)),
+//       );
+//     } catch (e) {
+//       print('Error: $e');
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Failed to sign in: $e')),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: const Color(0xFF003F63),
+//       body: Center(
+//         child: Padding(
+//           padding: const EdgeInsets.all(24.0),
+//           child: SingleChildScrollView(
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 const Text(
+//                   'Sign In',
+//                   style: TextStyle(
+//                     fontSize: 32,
+//                     fontWeight: FontWeight.bold,
+//                     color: Colors.white,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 30),
+//                 Image.asset(
+//                   'assets/magic.jpg',
+//                   width: 100,
+//                   height: 100,
+//                   fit: BoxFit.cover,
+//                 ),
+//                 const SizedBox(height: 20),
+//                 TextFormField(
+//                   controller: _emailController,
+//                   decoration: InputDecoration(
+//                     hintText: 'Email',
+//                     prefixIcon: const Icon(Icons.email, color: Colors.black),
+//                     filled: true,
+//                     fillColor: Colors.white,
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(30),
+//                     ),
+//                   ),
+//                   keyboardType: TextInputType.emailAddress,
+//                 ),
+//                 const SizedBox(height: 20),
+//                 TextFormField(
+//                   controller: _passwordController,
+//                   obscureText: true,
+//                   decoration: InputDecoration(
+//                     hintText: 'Password',
+//                     prefixIcon: const Icon(Icons.lock, color: Colors.black),
+//                     filled: true,
+//                     fillColor: Colors.white,
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(30),
+//                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(height: 30),
+//                 ElevatedButton(
+//                   onPressed: _signIn,
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: Colors.blue,
+//                     padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(30),
+//                     ),
+//                   ),
+//                   child: const Text(
+//                     'Sign In',
+//                     style: TextStyle(fontSize: 18, color: Colors.white),
+//                   ),
+//                 ),
+//                 const SizedBox(height: 20),
+//                 GestureDetector(
+//                   onTap: () {
+//                     Navigator.pushReplacement(
+//                       context,
+//                       MaterialPageRoute(builder: (context) => const SignUpPage()),
+//                     );
+//                   },
+//                   child: const Text(
+//                     "Don't have an account? Sign Up",
+//                     style: TextStyle(color: Colors.white),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

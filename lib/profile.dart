@@ -1,4 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -8,14 +12,16 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   // User details
-  Map<String, String> userDetails = {
-    'name': 'Dr. Blessed Prince P',
-    'image': 'assets/blessed sir.webp',
-    'availability': 'Monday: 10 to 12\nTuesday: 10 to 12\nWednesday: 12 to 2\nThursday: 9 to 10\nFriday: 10 to 11',
-    'cabin': 'LS07',
-    'description': 'A highly experienced administrator with a passion for teaching and helping students.'
-  };
+  String userId = 'unique_user_id'; // Replace with actual user ID from authentication
+  String? profileImage;
+  String name = '';
+  String cabin = '';
+  String availability = '';
+  String description = '';
+  bool isEditing = false; // Track if user is editing
 
   // Controllers for editing
   final TextEditingController nameController = TextEditingController();
@@ -23,26 +29,59 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController availabilityController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
-  bool isEditing = false; // Track if user is editing
-
   @override
   void initState() {
     super.initState();
-    // Set initial values in controllers
-    nameController.text = userDetails['name']!;
-    cabinController.text = userDetails['cabin']!;
-    availabilityController.text = userDetails['availability']!;
-    descriptionController.text = userDetails['description']!;
+    fetchUserData();
   }
 
-  // Save updated details
+  // Fetch user data from Firestore
+  Future<void> fetchUserData() async {
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+    if (userDoc.exists) {
+      setState(() {
+        profileImage = userDoc['image'];
+        name = userDoc['name'];
+        cabin = userDoc['cabin'];
+        availability = userDoc['availability'];
+        description = userDoc['description'];
+      });
+      // Set initial values in controllers
+      nameController.text = name;
+      cabinController.text = cabin;
+      availabilityController.text = availability;
+      descriptionController.text = description;
+    }
+  }
+
+  // Pick an image from the gallery
+  Future<void> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        profileImage = image.path; // Update profile image path
+      });
+    }
+  }
+
+  // Save updated details to Firestore
   void saveDetails() {
     setState(() {
-      userDetails['name'] = nameController.text;
-      userDetails['cabin'] = cabinController.text;
-      userDetails['availability'] = availabilityController.text;
-      userDetails['description'] = descriptionController.text;
+      name = nameController.text;
+      cabin = cabinController.text;
+      availability = availabilityController.text;
+      description = descriptionController.text;
       isEditing = false; // Exit edit mode when saving
+    });
+
+    // Save to Firestore
+    _firestore.collection('users').doc(userId).set({
+      'image': profileImage,
+      'name': name,
+      'cabin': cabin,
+      'availability': availability,
+      'description': description,
     });
   }
 
@@ -72,53 +111,75 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Profile Image
-                Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 65,
-                      backgroundImage: AssetImage(userDetails['image']!),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
+      body: RefreshIndicator(
+        onRefresh: fetchUserData, // Pull-to-refresh feature
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(), // Ensure scrollability for refresh
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Profile Image
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: isEditing ? pickImage : null, // Only pick image when in edit mode
+                        child: CircleAvatar(
+                          radius: 65,
+                          backgroundImage: profileImage != null
+                              ? FileImage(File(profileImage!))
+                              : const AssetImage('assets/user (2).png') as ImageProvider, // Default image
+                        ),
+                      ),
+                      // Edit icon (shown when editing)
+                      if (isEditing)
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: IconButton(
+                            icon: Icon(Icons.camera_alt, color: Colors.white), // Black camera icon
+                            onPressed: pickImage,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
 
-                // Name (Editable when in edit mode)
-                buildEditableField(
-                  label: 'Name:',
-                  controller: nameController,
-                  isEditing: isEditing,
-                ),
+                  // Name (Editable when in edit mode)
+                  buildEditableField(
+                    label: 'Name:',
+                    controller: nameController,
+                    isEditing: isEditing,
+                  ),
 
-                // Cabin
-                buildEditableField(
-                  label: 'Cabin:',
-                  controller: cabinController,
-                  isEditing: isEditing,
-                ),
+                  // Cabin
+                  buildEditableField(
+                    label: 'Cabin:',
+                    controller: cabinController,
+                    isEditing: isEditing,
+                  ),
 
-                // Availability (centered text)
-                buildEditableField(
-                  label: 'Availability:',
-                  controller: availabilityController,
-                  isEditing: isEditing,
-                  isCentered: true,
-                ),
+                  // Availability (centered text)
+                  buildEditableField(
+                    label: 'Availability:',
+                    controller: availabilityController,
+                    isEditing: isEditing,
+                    isCentered: true,
+                    maxLines: 3,
+                  ),
 
-                // Description
-                buildEditableField(
-                  label: 'Description:',
-                  controller: descriptionController,
-                  isEditing: isEditing,
-                ),
-              ],
+                  // Description
+                  buildEditableField(
+                    label: 'Description:',
+                    controller: descriptionController,
+                    isEditing: isEditing,
+                    maxLines: 3,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -172,4 +233,10 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MaterialApp(home: ProfilePage()));
 }
